@@ -18,7 +18,37 @@
         <h2>Weather Search</h2>
         <p>Filll out the form to get weather info!</p>
       </div>
-      <div id="search-inputs"></div>
+      <div id="search-inputs">
+        <div>
+          <p>Street</p>
+          <input type="text" />
+        </div>
+        <div id="city-state-div">
+          <div>
+            <p>City</p>
+            <input type="text" />
+          </div>
+          <div>
+            <p>State</p>
+            <select>
+              <option>Alabama</option>
+              <option>California</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="line"></div>
+
+        <div id="auto-detect">
+          <p>Want us to auto detect your location? Check here:</p>
+          <input type="checkbox" name="" id="" />
+        </div>
+
+        <div id="buttons">
+          <button id="submit-button">SUBMIT</button>
+          <button id="clear-button">CLEAR</button>
+        </div>
+      </div>
     </div>
     <script src="main.js"></script>
   </body>

@@ -1,3 +1,4 @@
+/*General*/
 body {
   background-color: rgb(230, 230, 230);
   font-family: "Montserrat", sans-serif;
@@ -8,8 +9,12 @@ body {
   height: 300px;
   border: 1px solid rgb(207, 207, 207);
   margin: 0 auto;
+  background-color: white;
 }
 
+/*Search box*/
+
+/*Search Header*/
 #search-header {
   padding-left: 25px;
   margin-top: 0px;
@@ -17,6 +22,7 @@ body {
   background-image: url(/Images/banner.jpg);
   background-position: left 20%;
   background-size: 220%;
+  color: rgb(80, 85, 95);
 }
 
 #search-header h2 {
@@ -29,4 +35,88 @@ body {
 #search-header p {
   font-size: 10px;
   margin-top: 10px;
+}
+
+/*Search Inputs*/
+
+#search-inputs {
+  margin: 20px 25px;
+}
+
+#search-inputs p {
+  font-size: 9px;
+  color: rgb(96, 113, 150);
+  font-weight: 500;
+  margin-bottom: 0px;
+}
+
+#search-inputs input[type="text"] {
+  border-radius: 0;
+  box-sizing: border-box;
+  height: 20px;
+  border: 0.5px solid rgb(207, 207, 207);
+  width: 100%;
+}
+
+#city-state-div {
+  display: flex;
+}
+
+#city-state-div div:last-child {
+  margin-left: auto;
+}
+
+#city-state-div select {
+  width: 160px;
+
+  height: 20px;
+  border-radius: 0;
+}
+
+#line {
+  margin: 20px 0;
+  width: 80x;
+  border-bottom: 1px solid rgb(207, 207, 207);
+}
+
+#auto-detect {
+  display: flex;
+}
+
+#auto-detect p {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+#auto-detect input {
+  margin: auto 5px;
+}
+
+#buttons {
+  display: flex;
+}
+
+#buttons button {
+  margin-top: 20px;
+  margin-right: 2px;
+  width: 20%;
+  height: 30px;
+  font-weight: 100;
+  font-size: 10px;
+  border-right: 0;
+  border-left: 0;
+  border-top: 0;
+
+  color: white;
+}
+
+#submit-button {
+  background-color: rgb(85, 110, 168);
+  border-bottom: 3px solid rgb(56, 73, 116);
+}
+
+#clear-button {
+  background-color: rgb(243 185 64);
+  border-bottom: 3px solid rgb(237, 138, 51);
 }
