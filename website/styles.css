@@ -164,7 +164,7 @@ body {
 #todays-temp span {
   font-size: 50px;
   padding-top: 10px;
-  margin-left: 3px;
+  margin-left: 0px;
 }
 
 #todays-weather-text {
@@ -200,4 +200,38 @@ body {
   max-height: 24px;
   margin: 0 auto;
   filter: opacity(80%);
+}
+
+/*week table*/
+
+#week-table {
+  width: 800px;
+
+  min-height: 200px;
+  margin: 0 auto;
+}
+
+#table-header {
+  background-color: rgb(85, 110, 168);
+  width: 100%;
+  height: 30px;
+  display: flex;
+  text-align: center;
+}
+
+#table-header p {
+  margin: auto auto;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+#table-header p:first-child {
+  width: 25%;
+}
+
+.table-row {
+  margin: 10px 0;
+  width: 100%;
+  height: 60px;
+  background-color: white;
 }
