@@ -267,3 +267,7 @@ body {
 .table-row :first-child {
   width: 36%;
 }
+
+.hidden {
+  display: none;
+}

@@ -60,6 +60,9 @@ const WEATHER_ICON_MAP = {
 const submit_btn = document.getElementById("submit-button");
 const clear_btn = document.getElementById("clear-button");
 
+const week_table = document.getElementById("week-table");
+const table_row = document.querySelector(".table-row");
+
 submit_btn.addEventListener("click", (e) => {
   e.preventDefault();
   console.log("submit button pressed!");
@@ -124,6 +127,34 @@ submit_btn.addEventListener("click", (e) => {
         todays_weather_symbole.src =
           "/Images/weather_symbols/" +
           WEATHER_ICON_MAP[today.values.weatherCodeMax];
+
+        //Cloning the table row and implementing it for each day we get
+
+        for (const day of daily) {
+          const isoDate = new Date(day.time);
+          const date = isoDate.toLocaleDateString();
+          const temp_high = day.values.temperatureMax;
+          const temp_low = day.values.temperatureMin;
+          const wind = day.values.windSpeedAvg;
+          const weather_code = day.values.weatherCodeMax;
+
+          const row_clone = table_row.cloneNode(true);
+
+          const ps = row_clone.querySelectorAll("p");
+          const img = row_clone.querySelector("img");
+
+          ps[0].textContent = date;
+          ps[1].textContent = WEATHER_CODE_MAP[weather_code];
+          ps[2].textContent = temp_high;
+          ps[3].textContent = temp_low;
+          ps[4].textContent = wind;
+
+          img.src = "/Images/weather_symbols/" + WEATHER_ICON_MAP[weather_code];
+
+          row_clone.classList.remove("hidden");
+
+          week_table.appendChild(row_clone);
+        }
 
         console.log(todays_temp.value);
       })
