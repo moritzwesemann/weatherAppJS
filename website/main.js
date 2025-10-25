@@ -66,7 +66,7 @@ const week_table = document.getElementById("week-table");
 const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
 
-submit_btn.addEventListener("click", (e) => {
+submit_btn.addEventListener("click", async (e) => {
   e.preventDefault();
   console.log("submit button pressed!");
 
@@ -74,83 +74,95 @@ submit_btn.addEventListener("click", (e) => {
   todays_card.classList.add("hidden");
   week_table.replaceChildren(table_header);
 
+  let geo_address = "";
+
   if (checkbox.checked) {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          console.log("Latitude:", latitude);
-          console.log("Longitude:", longitude);
+      try {
+        const position = await getPosition();
+        const { latitude, longitude } = position.coords;
 
-          const url = `http://127.0.0.1:3001/weather/latlon?location=${encodeURIComponent(
-            latitude
-          )},%20${encodeURIComponent(longitude)}`;
+        console.log("Latitude:", latitude);
+        console.log("Longitude:", longitude);
 
-          fetch(url)
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`HTTP error. Code: ${response.status}`);
-              }
+        const url = `http://127.0.0.1:3001/location?lat=${encodeURIComponent(
+          latitude
+        )}&lon=${encodeURIComponent(longitude)}`;
 
-              return response.json();
-            })
-            .then((data) => {
-              updateUI(data);
-              console.log(data);
-            })
-            .catch((error) => {
-              console.error(`Error trying to fetch the data: ${error}`);
-            });
-        },
-        (error) => {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              console.error("User denied the request for Geolocation.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              console.error("Location information is unavailable.");
-              break;
-            case error.TIMEOUT:
-              console.error("The request to get user location timed out.");
-              break;
-            case error.UNKNOWN_ERROR:
-              console.error("An unknown error occurred.");
-              break;
-          }
+        await fetch(url)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error. Code: ${response.status}`);
+            }
+
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+            geo_address = data;
+          })
+          .catch((error) => {
+            console.error(`Error trying to fetch the data: ${error}`);
+          });
+      } catch (error) {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            console.error("User denied the request for Geolocation.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            console.error("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            console.error("The request to get user location timed out.");
+            break;
+          case error.UNKNOWN_ERROR:
+            console.error("An unknown error occurred.");
+            break;
         }
-      );
-    }
-  } else {
-    const street = document.getElementById("street-input").value;
-    const city = document.getElementById("city-input").value;
-    const state = document.getElementById("state-input").value;
-
-    if (!street || !city || state === "Select your State") {
-      console.log(
-        "Bro you have to put in some stuff or check the auto detect button"
-      );
-    } else {
-      const url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
-        street
-      )}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
-
-      fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error. Code: ${response.status}`);
-          }
-
-          return response.json();
-        })
-        .then((data) => {
-          updateUI(data);
-        })
-        .catch((error) => {
-          console.error(`Error trying to fetch the data: ${error}`);
-        });
+      }
     }
   }
+
+  const street = document.getElementById("street-input").value;
+  const city = document.getElementById("city-input").value;
+  const state = document.getElementById("state-input").value;
+
+  let url = "";
+
+  if (
+    (!street || !city || state === "Select your State") &&
+    !checkbox.checked
+  ) {
+    console.log(
+      "Bro you have to put in some stuff or check the auto detect button"
+    );
+    return;
+  }
+
+  if (checkbox.checked) {
+    url = `http://127.0.0.1:3001/weather?full_address=${encodeURIComponent(
+      geo_address
+    )}`;
+    console.log(url);
+  } else {
+    url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
+      street
+    )}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
+  }
+
+  fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error. Code: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      updateUI(data);
+    })
+    .catch((error) => {
+      console.error(`Error trying to fetch the data: ${error}`);
+    });
 });
 
 clear_btn.addEventListener("click", (e) => {
@@ -240,4 +252,10 @@ function updateUI(data) {
     week_table.classList.remove("hidden");
     todays_card.classList.remove("hidden");
   }
+}
+
+function getPosition() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
 }
