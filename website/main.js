@@ -60,12 +60,21 @@ const WEATHER_ICON_MAP = {
 const submit_btn = document.getElementById("submit-button");
 const clear_btn = document.getElementById("clear-button");
 
+const todays_card = document.getElementById("todays-card");
+
 const week_table = document.getElementById("week-table");
+const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
 
 submit_btn.addEventListener("click", (e) => {
   e.preventDefault();
   console.log("submit button pressed!");
+
+  week_table.classList.add("hidden");
+  todays_card.classList.add("hidden");
+
+  week_table.replaceChildren(table_header);
+
   const street = document.getElementById("street-input").value;
   const city = document.getElementById("city-input").value;
   const state = document.getElementById("state-input").value;
@@ -77,6 +86,10 @@ submit_btn.addEventListener("click", (e) => {
   const todays_visbility = document.getElementById("todays_visbility");
   const todays_cloud = document.getElementById("todays_cloud");
   const todays_uv = document.getElementById("todays_uv");
+
+  const todays_location = document
+    .getElementById("todays-card")
+    .querySelector("h1");
 
   const todays_weather_symbole = document.getElementById(
     "todays-weather-symbole"
@@ -121,6 +134,10 @@ submit_btn.addEventListener("click", (e) => {
           String(today.values.visibilityAvg) + "km";
         todays_cloud.textContent = String(today.values.cloudCoverAvg) + "%";
         todays_uv.textContent = String(today.values.uvIndexAvg);
+        todays_location.textContent = String(data.location.name)
+          .split(",")
+          .slice(0, 2)
+          .join(",");
 
         todays_weather_code.textContent =
           WEATHER_CODE_MAP[today.values.weatherCodeMax];
@@ -154,6 +171,9 @@ submit_btn.addEventListener("click", (e) => {
           row_clone.classList.remove("hidden");
 
           week_table.appendChild(row_clone);
+
+          week_table.classList.remove("hidden");
+          todays_card.classList.remove("hidden");
         }
 
         console.log(todays_temp.value);
@@ -166,6 +186,10 @@ submit_btn.addEventListener("click", (e) => {
 
 clear_btn.addEventListener("click", (e) => {
   e.preventDefault;
+
+  week_table.classList.add("hidden");
+  todays_card.classList.add("hidden");
+
   console.log("clear button pressed!");
 
   const street = document.getElementById("street-input");
