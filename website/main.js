@@ -59,9 +59,9 @@ const WEATHER_ICON_MAP = {
 
 const submit_btn = document.getElementById("submit-button");
 const clear_btn = document.getElementById("clear-button");
+const checkbox = document.getElementById("check-box");
 
 const todays_card = document.getElementById("todays-card");
-
 const week_table = document.getElementById("week-table");
 const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
@@ -72,115 +72,84 @@ submit_btn.addEventListener("click", (e) => {
 
   week_table.classList.add("hidden");
   todays_card.classList.add("hidden");
-
   week_table.replaceChildren(table_header);
 
-  const street = document.getElementById("street-input").value;
-  const city = document.getElementById("city-input").value;
-  const state = document.getElementById("state-input").value;
+  if (checkbox.checked) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          console.log("Latitude:", latitude);
+          console.log("Longitude:", longitude);
 
-  const todays_temp = document.getElementById("todays-temp");
-  const todays_humidity = document.getElementById("todays_humidity");
-  const todays_pressure = document.getElementById("todays_pressure");
-  const todays_wind = document.getElementById("todays_wind");
-  const todays_visbility = document.getElementById("todays_visbility");
-  const todays_cloud = document.getElementById("todays_cloud");
-  const todays_uv = document.getElementById("todays_uv");
+          const url = `http://127.0.0.1:3001/weather/latlon?location=${encodeURIComponent(
+            latitude
+          )},%20${encodeURIComponent(longitude)}`;
 
-  const todays_location = document
-    .getElementById("todays-card")
-    .querySelector("h1");
+          fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error. Code: ${response.status}`);
+              }
 
-  const todays_weather_symbole = document.getElementById(
-    "todays-weather-symbole"
-  );
-
-  const todays_weather_code = document.getElementById("todays-weather-text");
-
-  if (!street || !city || state === "Select your State") {
-    console.log(
-      "Bro you have to put in some stuff or check the auto detect button"
-    );
+              return response.json();
+            })
+            .then((data) => {
+              updateUI(data);
+              console.log(data);
+            })
+            .catch((error) => {
+              console.error(`Error trying to fetch the data: ${error}`);
+            });
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.error("User denied the request for Geolocation.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.error("Location information is unavailable.");
+              break;
+            case error.TIMEOUT:
+              console.error("The request to get user location timed out.");
+              break;
+            case error.UNKNOWN_ERROR:
+              console.error("An unknown error occurred.");
+              break;
+          }
+        }
+      );
+    }
   } else {
-    const url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
-      street
-    )}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
+    const street = document.getElementById("street-input").value;
+    const city = document.getElementById("city-input").value;
+    const state = document.getElementById("state-input").value;
 
-    console.log(url);
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error. Code: ${response.status}`);
-        }
+    if (!street || !city || state === "Select your State") {
+      console.log(
+        "Bro you have to put in some stuff or check the auto detect button"
+      );
+    } else {
+      const url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
+        street
+      )}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
 
-        return response.json();
-      })
-      .then((data) => {
-        const {
-          timelines: { daily, hourly, minutley },
-        } = data;
-        console.log(data);
-        console.log(daily);
-        const today = daily[0];
-        console.log(today);
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error. Code: ${response.status}`);
+          }
 
-        todays_temp.textContent =
-          String(Math.round(today.values.temperatureMax)) + "°";
-        todays_humidity.textContent = String(today.values.humidityAvg) + "%";
-        todays_pressure.textContent =
-          String(today.values.pressureSeaLevelAvg) + "hPa";
-        todays_wind.textContent = String(today.values.windSpeedAvg) + "m/s";
-        todays_visbility.textContent =
-          String(today.values.visibilityAvg) + "km";
-        todays_cloud.textContent = String(today.values.cloudCoverAvg) + "%";
-        todays_uv.textContent = String(today.values.uvIndexAvg);
-        todays_location.textContent = String(data.location.name)
-          .split(",")
-          .slice(0, 2)
-          .join(",");
-
-        todays_weather_code.textContent =
-          WEATHER_CODE_MAP[today.values.weatherCodeMax];
-        todays_weather_symbole.src =
-          "/Images/weather_symbols/" +
-          WEATHER_ICON_MAP[today.values.weatherCodeMax];
-
-        //Cloning the table row and implementing it for each day we get
-
-        for (const day of daily) {
-          const isoDate = new Date(day.time);
-          const date = isoDate.toLocaleDateString();
-          const temp_high = day.values.temperatureMax;
-          const temp_low = day.values.temperatureMin;
-          const wind = day.values.windSpeedAvg;
-          const weather_code = day.values.weatherCodeMax;
-
-          const row_clone = table_row.cloneNode(true);
-
-          const ps = row_clone.querySelectorAll("p");
-          const img = row_clone.querySelector("img");
-
-          ps[0].textContent = date;
-          ps[1].textContent = WEATHER_CODE_MAP[weather_code];
-          ps[2].textContent = temp_high;
-          ps[3].textContent = temp_low;
-          ps[4].textContent = wind;
-
-          img.src = "/Images/weather_symbols/" + WEATHER_ICON_MAP[weather_code];
-
-          row_clone.classList.remove("hidden");
-
-          week_table.appendChild(row_clone);
-
-          week_table.classList.remove("hidden");
-          todays_card.classList.remove("hidden");
-        }
-
-        console.log(todays_temp.value);
-      })
-      .catch((error) => {
-        console.error(`Error trying to fetch the data: ${error}`);
-      });
+          return response.json();
+        })
+        .then((data) => {
+          updateUI(data);
+        })
+        .catch((error) => {
+          console.error(`Error trying to fetch the data: ${error}`);
+        });
+    }
   }
 });
 
@@ -200,3 +169,75 @@ clear_btn.addEventListener("click", (e) => {
   street.value = "";
   state.selectIndex = 0;
 });
+
+function updateUI(data) {
+  const todays_temp = document.getElementById("todays-temp");
+  const todays_humidity = document.getElementById("todays_humidity");
+  const todays_pressure = document.getElementById("todays_pressure");
+  const todays_wind = document.getElementById("todays_wind");
+  const todays_visbility = document.getElementById("todays_visbility");
+  const todays_cloud = document.getElementById("todays_cloud");
+  const todays_uv = document.getElementById("todays_uv");
+  const todays_location = document
+    .getElementById("todays-card")
+    .querySelector("h1");
+  const todays_weather_symbole = document.getElementById(
+    "todays-weather-symbole"
+  );
+  const todays_weather_code = document.getElementById("todays-weather-text");
+
+  const {
+    timelines: { daily, hourly, minutley },
+  } = data;
+  const today = daily[0];
+
+  todays_temp.textContent =
+    String(Math.round(today.values.temperatureMax)) + "°";
+  todays_humidity.textContent = String(today.values.humidityAvg) + "%";
+  todays_pressure.textContent =
+    String(today.values.pressureSeaLevelAvg) + "hPa";
+  todays_wind.textContent = String(today.values.windSpeedAvg) + "m/s";
+  todays_visbility.textContent = String(today.values.visibilityAvg) + "km";
+  todays_cloud.textContent = String(today.values.cloudCoverAvg) + "%";
+  todays_uv.textContent = String(today.values.uvIndexAvg);
+  todays_location.textContent = String(data.location.name)
+    .split(",")
+    .slice(0, 2)
+    .join(",");
+
+  todays_weather_code.textContent =
+    WEATHER_CODE_MAP[today.values.weatherCodeMax];
+  todays_weather_symbole.src =
+    "/Images/weather_symbols/" + WEATHER_ICON_MAP[today.values.weatherCodeMax];
+
+  //Cloning the table row and implementing it for each day we get
+
+  for (const day of daily) {
+    const isoDate = new Date(day.time);
+    const date = isoDate.toLocaleDateString();
+    const temp_high = day.values.temperatureMax;
+    const temp_low = day.values.temperatureMin;
+    const wind = day.values.windSpeedAvg;
+    const weather_code = day.values.weatherCodeMax;
+
+    const row_clone = table_row.cloneNode(true);
+
+    const ps = row_clone.querySelectorAll("p");
+    const img = row_clone.querySelector("img");
+
+    ps[0].textContent = date;
+    ps[1].textContent = WEATHER_CODE_MAP[weather_code];
+    ps[2].textContent = temp_high;
+    ps[3].textContent = temp_low;
+    ps[4].textContent = wind;
+
+    img.src = "/Images/weather_symbols/" + WEATHER_ICON_MAP[weather_code];
+
+    row_clone.classList.remove("hidden");
+
+    week_table.appendChild(row_clone);
+
+    week_table.classList.remove("hidden");
+    todays_card.classList.remove("hidden");
+  }
+}

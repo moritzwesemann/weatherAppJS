@@ -42,6 +42,32 @@ app.get("/weather", (req, res) => {
     });
 });
 
+app.get("/weather/latlon", (req, res) => {
+  const location = req.query.location;
+
+  const fullURL = baseUrl + location + apiKeyURL;
+  console.log("fullURL");
+
+  fetch(fullURL)
+    .then((response) => {
+      //catches normal http errors
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Fetched data:" + data);
+      res.json(data);
+    })
+    //catches all other errors. even something like json parsing or so on
+    .catch((error) => {
+      res.status(500).json({ error: error.message || "Internal Server Error" });
+      console.error("Error fetching data: " + error);
+    });
+});
+
 app.listen(port, () => {
   console.log(`Express server running on port: ${port}`);
 });
