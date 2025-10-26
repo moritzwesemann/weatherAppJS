@@ -272,3 +272,9 @@ body {
 .hidden {
   display: none;
 }
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  background-color: lightgray;
+}

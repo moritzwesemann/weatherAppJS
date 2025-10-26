@@ -66,9 +66,24 @@ const week_table = document.getElementById("week-table");
 const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
 
+checkbox.addEventListener("change", (e) => {
+  const street_input = document.getElementById("street-input");
+  const city_input = document.getElementById("city-input");
+  const state_input = document.getElementById("state-input");
+
+  if (checkbox.checked) {
+    street_input.classList.add("disabled");
+    city_input.classList.add("disabled");
+    state_input.classList.add("disabled");
+  } else {
+    street_input.classList.remove("disabled");
+    city_input.classList.remove("disabled");
+    state_input.classList.remove("disabled");
+  }
+});
+
 submit_btn.addEventListener("click", async (e) => {
   e.preventDefault();
-  console.log("submit button pressed!");
 
   week_table.classList.add("hidden");
   todays_card.classList.add("hidden");
@@ -81,9 +96,6 @@ submit_btn.addEventListener("click", async (e) => {
       try {
         const position = await getPosition();
         const { latitude, longitude } = position.coords;
-
-        console.log("Latitude:", latitude);
-        console.log("Longitude:", longitude);
 
         const url = `http://127.0.0.1:3001/location?lat=${encodeURIComponent(
           latitude
@@ -98,7 +110,6 @@ submit_btn.addEventListener("click", async (e) => {
             return response.json();
           })
           .then((data) => {
-            console.log(data);
             geo_address = data;
           })
           .catch((error) => {
@@ -143,7 +154,6 @@ submit_btn.addEventListener("click", async (e) => {
     url = `http://127.0.0.1:3001/weather?full_address=${encodeURIComponent(
       geo_address
     )}`;
-    console.log(url);
   } else {
     url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
       street
@@ -171,8 +181,6 @@ clear_btn.addEventListener("click", (e) => {
   week_table.classList.add("hidden");
   todays_card.classList.add("hidden");
 
-  console.log("clear button pressed!");
-
   const street = document.getElementById("street-input");
   const city = document.getElementById("city-input");
   const state = document.getElementById("state-input");
@@ -180,6 +188,10 @@ clear_btn.addEventListener("click", (e) => {
   city.value = "";
   street.value = "";
   state.selectIndex = 0;
+  street.classList.remove("disabled");
+  city.classList.remove("disabled");
+  state.classList.remove("disabled");
+  checkbox.checked = false;
 });
 
 function updateUI(data) {
