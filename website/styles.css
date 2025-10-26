@@ -1,5 +1,6 @@
 /*General*/
 body {
+  font-family: "Open Sans", sans-serif; /* fix to load the font for the other components already hehe*/
   background-color: rgb(230, 230, 230);
   font-family: "Montserrat", sans-serif;
 }

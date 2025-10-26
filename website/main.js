@@ -207,9 +207,9 @@ function updateUI(data) {
     String(Math.round(today.values.temperatureMax)) + "°";
   todays_humidity.textContent = String(today.values.humidityAvg) + "%";
   todays_pressure.textContent =
-    String(today.values.pressureSeaLevelAvg) + "hPa";
-  todays_wind.textContent = String(today.values.windSpeedAvg) + "m/s";
-  todays_visbility.textContent = String(today.values.visibilityAvg) + "km";
+    String(today.values.pressureSeaLevelAvg) + "inHg";
+  todays_wind.textContent = String(today.values.windSpeedAvg) + "mph";
+  todays_visbility.textContent = String(today.values.visibilityAvg) + "mi";
   todays_cloud.textContent = String(today.values.cloudCoverAvg) + "%";
   todays_uv.textContent = String(today.values.uvIndexAvg);
   todays_location.textContent = String(data.location.name)
@@ -248,10 +248,9 @@ function updateUI(data) {
     row_clone.classList.remove("hidden");
 
     week_table.appendChild(row_clone);
-
-    week_table.classList.remove("hidden");
-    todays_card.classList.remove("hidden");
   }
+  week_table.classList.remove("hidden");
+  todays_card.classList.remove("hidden");
 }
 
 function getPosition() {

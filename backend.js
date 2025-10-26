@@ -29,9 +29,17 @@ app.get("/weather", (req, res) => {
   let fullURL = "";
 
   if (full_address) {
-    fullURL = baseUrl + full_address + apiKeyURL;
+    fullURL = baseUrl + full_address + "&units=imperial" + apiKeyURL;
   } else {
-    fullURL = baseUrl + street + "%20" + city + "%20" + state + apiKeyURL;
+    fullURL =
+      baseUrl +
+      street +
+      "%20" +
+      city +
+      "%20" +
+      state +
+      "&units=imperial" +
+      apiKeyURL;
   }
 
   fetch(fullURL)
