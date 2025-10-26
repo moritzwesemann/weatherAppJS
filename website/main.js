@@ -85,9 +85,12 @@ checkbox.addEventListener("change", (e) => {
 submit_btn.addEventListener("click", async (e) => {
   e.preventDefault();
 
+  const dd_section = document.getElementById("daily-details-section");
+
   week_table.classList.add("hidden");
   todays_card.classList.add("hidden");
   week_table.replaceChildren(table_header);
+  dd_section.classList.add("hidden");
 
   let geo_address = "";
 
@@ -178,8 +181,11 @@ submit_btn.addEventListener("click", async (e) => {
 clear_btn.addEventListener("click", (e) => {
   e.preventDefault;
 
+  const dd_section = document.getElementById("daily-details-section");
+
   week_table.classList.add("hidden");
   todays_card.classList.add("hidden");
+  dd_section.classList.add("hidden");
 
   const street = document.getElementById("street-input");
   const city = document.getElementById("city-input");
@@ -237,8 +243,7 @@ function updateUI(data) {
   //Cloning the table row and implementing it for each day we get
 
   for (const day of daily) {
-    const isoDate = new Date(day.time);
-    const date = isoDate.toLocaleDateString();
+    const date = day.time;
     const temp_high = day.values.temperatureMax;
     const temp_low = day.values.temperatureMin;
     const wind = day.values.windSpeedAvg;
@@ -249,13 +254,17 @@ function updateUI(data) {
     const ps = row_clone.querySelectorAll("p");
     const img = row_clone.querySelector("img");
 
-    ps[0].textContent = date;
+    ps[0].textContent = date_transfomer(date);
     ps[1].textContent = WEATHER_CODE_MAP[weather_code];
     ps[2].textContent = temp_high;
     ps[3].textContent = temp_low;
     ps[4].textContent = wind;
 
     img.src = "/Images/weather_symbols/" + WEATHER_ICON_MAP[weather_code];
+
+    row_clone.addEventListener("click", () => {
+      table_row_click(day);
+    });
 
     row_clone.classList.remove("hidden");
 
@@ -269,4 +278,77 @@ function getPosition() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
+}
+
+function table_row_click(data) {
+  const todays_card = document.getElementById("todays-card");
+  const week_table = document.getElementById("week-table");
+  const dd_section = document.getElementById("daily-details-section");
+
+  console.log(data);
+
+  todays_card.classList.add("hidden");
+  week_table.classList.add("hidden");
+  dd_section.classList.remove("hidden");
+
+  const top_card_ps = document
+    .getElementById("dd-card-top")
+    .querySelectorAll("p");
+  const top_card_img = document
+    .getElementById("dd-card-top")
+    .querySelector("img");
+
+  const bottom_card_spans = document
+    .getElementById("dd-card-bottom")
+    .querySelectorAll("span");
+
+  top_card_ps[0].textContent = date_transfomer(data.time);
+  top_card_ps[1].textContent = WEATHER_CODE_MAP[data.values.weatherCodeMax];
+  top_card_ps[2].textContent =
+    data.values.temperatureMax + "°F/" + data.values.temperatureMin + "°F";
+
+  top_card_img.src =
+    "/Images/weather_symbols/" + WEATHER_ICON_MAP[data.values.weatherCodeMax];
+
+  bottom_card_spans[0].innerHTML =
+    data.values.rainAccumulationSum === 0
+      ? "N/A"
+      : data.values.rainAccumulationSum;
+  bottom_card_spans[1].innerHTML =
+    data.values.precipitationProbabilityMax + "%";
+  bottom_card_spans[2].innerHTML = data.values.windSpeedMax + "mph";
+  bottom_card_spans[3].innerHTML = data.values.humidityAvg + "%";
+  bottom_card_spans[4].innerHTML = data.values.visibilityMax + "mi";
+  bottom_card_spans[5].innerHTML =
+    formatHourAmPm(data.values.sunriseTime) +
+    "/" +
+    formatHourAmPm(data.values.sunsetTime);
+}
+
+function date_transfomer(isoString, timeZone) {
+  const d = new Date(isoString);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    ...(timeZone ? { timeZone } : {}),
+  }).formatToParts(d);
+
+  const byType = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+  return `${byType.weekday}, ${byType.day} ${byType.month}, ${byType.year}`;
+}
+
+function formatHourAmPm(isoString, timeZone) {
+  const d = new Date(isoString);
+
+  const options = {
+    hour: "numeric",
+    hour12: true,
+    ...(timeZone ? { timeZone } : {}),
+  };
+
+  const formatted = new Intl.DateTimeFormat("en-US", options).format(d);
+
+  return formatted.replace(" ", "");
 }
