@@ -76,6 +76,9 @@ body {
 }
 
 #line {
+  margin: 0 auto;
+  width: 300px;
+  border-bottom: 1px solid lightgray;
   margin: 20px 0;
   width: 80x;
   border-bottom: 1px solid rgb(207, 207, 207);
@@ -277,4 +280,82 @@ body {
   opacity: 0.5;
   pointer-events: none;
   background-color: lightgray;
+}
+
+/* Daily Weather Details View*/
+
+#daily-details-section h1 {
+  text-align: center;
+  font-weight: 300;
+  font-size: 36px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+#line2 {
+  margin: 2px auto;
+  width: 300px;
+  border-bottom: 1px solid white;
+}
+
+#daily-details-card {
+  width: 400px;
+  border: 1px solid lightgray;
+  margin: 20px auto;
+
+  background: linear-gradient(to bottom, white, rgb(61, 77, 117));
+}
+
+#dd-card-top {
+  display: flex;
+  margin: 10px 20px;
+}
+
+#dd-card-top img {
+  width: 120px;
+  height: 120px;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+#dd-card-top p {
+  color: rgb(61, 77, 117);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 10px 0;
+}
+
+#dd-card-top p:last-child {
+  font-size: 24px;
+  margin-top: 0px;
+}
+
+#dd-card-bottom {
+  margin: 20px 0;
+}
+#dd-card-bottom p {
+  text-align: center;
+  margin: 6px auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+#dd-card-bottom span {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+#line3 {
+  margin: 5px auto;
+  width: 200px;
+  border-bottom: 1px solid white;
+}
+
+#arrow-toggle {
+  display: block;
+  margin: 0 auto;
+  width: 40px;
+  height: 40px;
 }
