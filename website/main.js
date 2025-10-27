@@ -66,7 +66,7 @@ const week_table = document.getElementById("week-table");
 const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
 
-let temp_chart = {};
+let temp_chart = [[]];
 
 checkbox.addEventListener("change", (e) => {
   const street_input = document.getElementById("street-input");
@@ -175,6 +175,8 @@ submit_btn.addEventListener("click", async (e) => {
     })
     .then((data) => {
       updateUI(data);
+      temp_chart = prepDataTempChart(data);
+      generateTempChart();
     })
     .catch((error) => {
       console.error(`Error trying to fetch the data: ${error}`);
@@ -362,17 +364,30 @@ function toDateString(datetime) {
 }
 
 function prepDataTempChart(data) {
+  const {
+    timelines: { daily },
+  } = data;
+
   let dates = [];
   let tempMin = [];
   let tempMax = [];
 
-  dates.append(toDateString(data.daily.time));
-  tempMin.append();
+  for (const el of daily) {
+    dates.push(toDateString(el.time));
+    tempMin.push(el.values.temperatureMin);
+    tempMax.push(el.values.temperatureMax);
+  }
+
+  let final_array = dates.map((_, i) => [dates[i], tempMin[i], tempMax[i]]);
+
+  console.log(final_array);
+
+  return dates.map((_, i) => [dates[i], tempMin[i], tempMax[i]]);
 }
 
 const highcharts_container = document.getElementById("highcharts");
 
-document.addEventListener("DOMContentLoaded", () => {
+function generateTempChart() {
   const chart = Highcharts.chart(highcharts_container, {
     data: {
       csvURL:
@@ -417,16 +432,22 @@ document.addEventListener("DOMContentLoaded", () => {
     legend: {
       enabled: false,
     },
+    plotOptions: {
+      arearange: {
+        marker: {
+          enabled: true, // show a dot at every point (not just on hover)
+          radius: 3,
+          symbol: "circle",
+          fillColor: "#57acf8", // blue fill
+          lineColor: "#FFFFFF", // blue outline
+          lineWidth: 1,
+        },
+      },
+    },
     series: [
       {
         name: "Temperatures",
-        data: [
-          ["2025-01-01", 30, 35],
-          ["2025-01-02", 32, 39],
-          ["2025-01-03", 35, 53],
-          ["2025-01-04", 33, 34],
-          ["2025-01-05", 31, 32],
-        ],
+        data: temp_chart,
         color: {
           linearGradient: {
             x1: 0,
@@ -442,4 +463,4 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     ],
   });
-});
+}
