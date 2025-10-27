@@ -177,6 +177,7 @@ submit_btn.addEventListener("click", async (e) => {
       updateUI(data);
       temp_chart = prepDataTempChart(data);
       generateTempChart();
+      demoRender();
     })
     .catch((error) => {
       console.error(`Error trying to fetch the data: ${error}`);
@@ -389,14 +390,6 @@ const highcharts_container = document.getElementById("highcharts");
 
 function generateTempChart() {
   const chart = Highcharts.chart(highcharts_container, {
-    data: {
-      csvURL:
-        "https://cdn.jsdelivr.net/gh/highcharts/highcharts@b99fc27c/samples/data/temp-florida-bergen-2023.csv",
-      beforeParse: function (csv) {
-        console.log(csv.replace(/\n\n/g, "\n"));
-        return csv.replace(/\n\n/g, "\n");
-      },
-    },
     chart: {
       type: "arearange",
       zooming: {
@@ -463,4 +456,126 @@ function generateTempChart() {
       },
     ],
   });
+}
+
+// simple-meteogram.js
+// If you load Highcharts via <script> tags in HTML, Highcharts is global.
+// If you're bundling (Vite/Webpack), see Option B for imports.
+
+// --- REQUIRED ONLY IF YOU BUNDLE AND IMPORT MODULES ---
+// import Highcharts from 'highcharts';
+// import Windbarb from 'highcharts/modules/windbarb';
+// Windbarb(Highcharts);
+
+// Shapes Highcharts expects:
+// temperatures: [{ x: msSinceEpoch, y: number }, ...]
+// precipitations: [{ x: msSinceEpoch, y: number }, ...]
+// winds: [{ x: msSinceEpoch, value: speedMps, direction: degCWFromNorth }, ...]
+
+function createMeteogram(
+  { temperatures, precipitations, winds },
+  containerId = "container"
+) {
+  const options = {
+    chart: {
+      renderTo: containerId,
+      height: 320,
+      marginRight: 40,
+      marginBottom: 60,
+      plotBorderWidth: 1,
+    },
+    title: { text: "My Meteogram" },
+    legend: { enabled: false },
+    tooltip: { shared: true },
+    xAxis: {
+      type: "datetime",
+      tickLength: 0,
+      gridLineWidth: 1,
+    },
+    yAxis: [
+      {
+        // Temperature (left)
+        title: { text: null },
+        labels: { format: "{value}°" },
+        gridLineColor: "rgba(128,128,128,0.1)",
+      },
+      {
+        // Precip (right)
+        title: { text: null },
+        labels: { enabled: false },
+        min: 0,
+        opposite: true,
+        gridLineWidth: 0,
+      },
+    ],
+    plotOptions: {
+      series: { pointPlacement: "between", turboThreshold: 0 },
+    },
+    series: [
+      {
+        name: "Temperature",
+        type: "spline",
+        data: temperatures,
+        marker: { enabled: false },
+        tooltip: { pointFormat: "Temp: <b>{point.y}°C</b><br/>" },
+        zIndex: 2,
+      },
+      {
+        name: "Precipitation",
+        type: "column",
+        data: precipitations,
+        yAxis: 1,
+        tooltip: { valueSuffix: " mm" },
+        groupPadding: 0,
+        pointPadding: 0,
+        zIndex: 1,
+      },
+      {
+        name: "Wind",
+        type: "windbarb",
+        data: winds,
+        yOffset: -10,
+        vectorLength: 18,
+        lineWidth: 1.5,
+        tooltip: { valueSuffix: " m/s" },
+        zIndex: 0,
+      },
+    ],
+  };
+
+  return new Highcharts.Chart(options);
+}
+
+// --- Example: fill arrays and render (delete after wiring real data) ---
+function demoRender() {
+  const t = (h) =>
+    Date.parse(`2025-10-27T${String(h).padStart(2, "0")}:00:00Z`);
+  const temperatures = [
+    { x: t(10), y: 18.4 },
+    { x: t(11), y: 19.2 },
+    { x: t(12), y: 20.0 },
+    { x: t(13), y: 20.3 },
+    { x: t(14), y: 20.1 },
+  ];
+  const precipitations = [
+    { x: t(10), y: 0.2 },
+    { x: t(11), y: 0.0 },
+    { x: t(12), y: 0.0 },
+    { x: t(13), y: 0.1 },
+    { x: t(14), y: 0.0 },
+  ];
+  const winds = [
+    { x: t(10), value: 4.1, direction: 220 },
+    { x: t(11), value: 4.8, direction: 230 },
+    { x: t(12), value: 5.2, direction: 240 },
+    { x: t(13), value: 5.0, direction: 235 },
+    { x: t(14), value: 4.6, direction: 225 },
+  ];
+
+  // Sort just in case:
+  temperatures.sort((a, b) => a.x - b.x);
+  precipitations.sort((a, b) => a.x - b.x);
+  winds.sort((a, b) => a.x - b.x);
+
+  createMeteogram({ temperatures, precipitations, winds }, "meteogram");
 }
