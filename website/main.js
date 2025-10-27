@@ -66,6 +66,8 @@ const week_table = document.getElementById("week-table");
 const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
 
+let temp_chart = {};
+
 checkbox.addEventListener("change", (e) => {
   const street_input = document.getElementById("street-input");
   const city_input = document.getElementById("city-input");
@@ -157,6 +159,7 @@ submit_btn.addEventListener("click", async (e) => {
     url = `http://127.0.0.1:3001/weather?full_address=${encodeURIComponent(
       geo_address
     )}`;
+    console.log(url);
   } else {
     url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
       street
@@ -352,3 +355,91 @@ function formatHourAmPm(isoString, timeZone) {
 
   return formatted.replace(" ", "");
 }
+
+function toDateString(datetime) {
+  if (!datetime) return "";
+  return datetime.split("T")[0];
+}
+
+function prepDataTempChart(data) {
+  let dates = [];
+  let tempMin = [];
+  let tempMax = [];
+
+  dates.append(toDateString(data.daily.time));
+  tempMin.append();
+}
+
+const highcharts_container = document.getElementById("highcharts");
+
+document.addEventListener("DOMContentLoaded", () => {
+  const chart = Highcharts.chart(highcharts_container, {
+    data: {
+      csvURL:
+        "https://cdn.jsdelivr.net/gh/highcharts/highcharts@b99fc27c/samples/data/temp-florida-bergen-2023.csv",
+      beforeParse: function (csv) {
+        console.log(csv.replace(/\n\n/g, "\n"));
+        return csv.replace(/\n\n/g, "\n");
+      },
+    },
+    chart: {
+      type: "arearange",
+      zooming: {
+        type: "x",
+      },
+      scrollablePlotArea: {
+        minWidth: 600,
+        scrollPositionX: 1,
+      },
+    },
+    title: {
+      text: "Temperature Ranges (Min, Max)",
+      align: "center",
+    },
+    xAxis: {
+      type: "datetime",
+      accessibility: {
+        rangeDescription: "Range: Jan 1st 2023 to Jan 1st 2024.",
+      },
+    },
+    yAxis: {
+      title: {
+        text: null,
+      },
+    },
+    tooltip: {
+      fixed: false,
+      crosshairs: true,
+      shared: true,
+      valueSuffix: "°F",
+      xDateFormat: "%A, %b %e",
+    },
+    legend: {
+      enabled: false,
+    },
+    series: [
+      {
+        name: "Temperatures",
+        data: [
+          ["2025-01-01", 30, 35],
+          ["2025-01-02", 32, 39],
+          ["2025-01-03", 35, 53],
+          ["2025-01-04", 33, 34],
+          ["2025-01-05", 31, 32],
+        ],
+        color: {
+          linearGradient: {
+            x1: 0,
+            x2: 0,
+            y1: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, "#f6aa2b"],
+            [1, "#cce8fc"],
+          ],
+        },
+      },
+    ],
+  });
+});

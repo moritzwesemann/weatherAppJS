@@ -359,3 +359,9 @@ body {
   width: 40px;
   height: 40px;
 }
+
+#highcharts {
+  margin: 20px auto;
+  width: 80%;
+  height: 800px;
+}
