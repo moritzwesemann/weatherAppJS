@@ -66,7 +66,12 @@ const week_table = document.getElementById("week-table");
 const table_header = document.getElementById("table-header");
 const table_row = document.querySelector(".table-row");
 
-let temp_chart = [[]];
+const tempchart_element = document.getElementById("highcharts");
+const metegoram_element = document.getElementById("meteogram");
+
+let temp_chart = [];
+
+let hourly_data = [];
 
 checkbox.addEventListener("change", (e) => {
   const street_input = document.getElementById("street-input");
@@ -176,8 +181,9 @@ submit_btn.addEventListener("click", async (e) => {
     .then((data) => {
       updateUI(data);
       temp_chart = prepDataTempChart(data);
+      hourly_data = data.timelines.hourly;
       generateTempChart();
-      demoRender();
+      renderMeteogram();
     })
     .catch((error) => {
       console.error(`Error trying to fetch the data: ${error}`);
@@ -192,6 +198,8 @@ clear_btn.addEventListener("click", (e) => {
   week_table.classList.add("hidden");
   todays_card.classList.add("hidden");
   dd_section.classList.add("hidden");
+  tempchart_element.classList.add("hidden");
+  metegoram_element.classList.add("hidden");
 
   const street = document.getElementById("street-input");
   const city = document.getElementById("city-input");
@@ -329,6 +337,8 @@ function table_row_click(data) {
     formatHourAmPm(data.values.sunriseTime) +
     "/" +
     formatHourAmPm(data.values.sunsetTime);
+
+  wireArrowToggle();
 }
 
 function date_transfomer(isoString, timeZone) {
@@ -491,6 +501,7 @@ function createMeteogram(
       type: "datetime",
       tickLength: 0,
       gridLineWidth: 1,
+      offset: 5,
     },
     yAxis: [
       {
@@ -517,8 +528,9 @@ function createMeteogram(
         type: "spline",
         data: temperatures,
         marker: { enabled: false },
-        tooltip: { pointFormat: "Temp: <b>{point.y}°C</b><br/>" },
+        tooltip: { pointFormat: "Temp: <b>{point.y}°F</b><br/>" },
         zIndex: 2,
+        color: "#E63946",
       },
       {
         name: "Precipitation",
@@ -534,11 +546,12 @@ function createMeteogram(
         name: "Wind",
         type: "windbarb",
         data: winds,
-        yOffset: -10,
-        vectorLength: 18,
+        yOffset: 12,
+        vectorLength: 14,
         lineWidth: 1.5,
         tooltip: { valueSuffix: " m/s" },
-        zIndex: 0,
+        zIndex: 1,
+        color: "#205fb9ff",
       },
     ],
   };
@@ -546,36 +559,56 @@ function createMeteogram(
   return new Highcharts.Chart(options);
 }
 
-// --- Example: fill arrays and render (delete after wiring real data) ---
-function demoRender() {
+function renderMeteogram() {
+  console.log(hourly_data);
+
+  const times = [];
+  const temp = [];
+  const percipi = [];
+
+  const wind_d = [];
+  const wind_s = [];
+
+  for (const i in hourly_data) {
+    times.push(Date.parse(hourly_data[i].time));
+    temp.push(Math.round(hourly_data[i].values.temperature));
+    percipi.push(hourly_data[i].values.precipitationProbability);
+    wind_d.push(Math.round(hourly_data[i].values.windDirection));
+    wind_s.push(Math.round(hourly_data[i].values.windSpeed));
+  }
+
+  const temperatures = times.map((x, i) => ({ x, y: temp[i] }));
+  const precipitations = times.map((x, i) => ({ x, y: percipi[i] }));
+
+  const winds = times.map((x, i) => ({
+    x,
+    value: wind_s[i],
+    direction: wind_d[i],
+  }));
+
+  console.log(temperatures);
+  console.log(precipitations);
+  console.log(winds);
   const t = (h) =>
     Date.parse(`2025-10-27T${String(h).padStart(2, "0")}:00:00Z`);
-  const temperatures = [
-    { x: t(10), y: 18.4 },
-    { x: t(11), y: 19.2 },
-    { x: t(12), y: 20.0 },
-    { x: t(13), y: 20.3 },
-    { x: t(14), y: 20.1 },
-  ];
-  const precipitations = [
-    { x: t(10), y: 0.2 },
-    { x: t(11), y: 0.0 },
-    { x: t(12), y: 0.0 },
-    { x: t(13), y: 0.1 },
-    { x: t(14), y: 0.0 },
-  ];
-  const winds = [
-    { x: t(10), value: 4.1, direction: 220 },
-    { x: t(11), value: 4.8, direction: 230 },
-    { x: t(12), value: 5.2, direction: 240 },
-    { x: t(13), value: 5.0, direction: 235 },
-    { x: t(14), value: 4.6, direction: 225 },
-  ];
-
-  // Sort just in case:
-  temperatures.sort((a, b) => a.x - b.x);
-  precipitations.sort((a, b) => a.x - b.x);
-  winds.sort((a, b) => a.x - b.x);
 
   createMeteogram({ temperatures, precipitations, winds }, "meteogram");
 }
+
+function wireArrowToggle() {
+  const arrow = document.getElementById("arrow-toggle");
+  if (!arrow || arrow.dataset.toggleWired) return; // avoid duplicates
+
+  arrow.dataset.toggleWired = "true";
+  arrow.addEventListener("click", (event) => {
+    const el = event.currentTarget;
+    const isDown = el.src.endsWith("point-down-512.png");
+
+    el.src = isDown ? "/Images/point-up-512.png" : "/Images/point-down-512.png";
+
+    tempchart_element.classList.toggle("hidden", !isDown);
+    metegoram_element.classList.toggle("hidden", !isDown);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", wireArrowToggle);
