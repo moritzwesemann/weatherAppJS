@@ -608,6 +608,10 @@ function wireArrowToggle() {
 
     tempchart_element.classList.toggle("hidden", !isDown);
     metegoram_element.classList.toggle("hidden", !isDown);
+
+    if (isDown) {
+      tempchart_element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
 }
 
