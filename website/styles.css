@@ -372,3 +372,16 @@ body {
   height: 300px;
   margin-bottom: 50px;
 }
+
+#back-button {
+  color: blue;
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+#back-button:hover {
+  text-decoration: underline;
+}

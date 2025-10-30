@@ -339,6 +339,8 @@ function table_row_click(data) {
     formatHourAmPm(data.values.sunsetTime);
 
   wireArrowToggle();
+
+  wireBackButton();
 }
 
 function date_transfomer(isoString, timeZone) {
@@ -659,4 +661,17 @@ function wireArrowToggle() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", wireArrowToggle);
+function wireBackButton() {
+  const back_button = document.getElementById("back-button");
+  if (!back_button || back_button.dataset.toggleWired) return;
+  back_button.dataset.toggleWired = "true";
+  const dd_sec = document.getElementById("daily-details-section");
+
+  back_button.addEventListener("click", (event) => {
+    tempchart_element.classList.add("hidden");
+    metegoram_element.classList.add("hidden");
+    todays_card.classList.remove("hidden");
+    week_table.classList.remove("hidden");
+    dd_sec.classList.add("hidden");
+  });
+}
