@@ -483,7 +483,7 @@ function generateTempChart() {
 // winds: [{ x: msSinceEpoch, value: speedMps, direction: degCWFromNorth }, ...]
 
 function createMeteogram(
-  { temperatures, precipitations, winds },
+  { temperatures, precipitations, winds, pressure },
   containerId = "container"
 ) {
   const options = {
@@ -494,14 +494,17 @@ function createMeteogram(
       marginBottom: 60,
       plotBorderWidth: 1,
     },
-    title: { text: "My Meteogram" },
+    title: { text: "Hourly Meteogram" },
     legend: { enabled: false },
     tooltip: { shared: true },
     xAxis: {
       type: "datetime",
       tickLength: 0,
       gridLineWidth: 1,
-      offset: 5,
+      offset: 0,
+      labels: {
+        y: 35,
+      },
     },
     yAxis: [
       {
@@ -518,6 +521,33 @@ function createMeteogram(
         opposite: true,
         gridLineWidth: 0,
       },
+      {
+        // Air pressure
+        allowDecimals: false,
+        title: {
+          // Title on top of axis
+          text: "inHg",
+          offset: 0,
+          align: "high",
+          rotation: 0,
+          style: {
+            color: "#FFB000",
+          },
+          textAlign: "left",
+          x: 3,
+        },
+        labels: {
+          style: {
+            fontSize: "8px",
+            color: "#FFB000",
+          },
+          y: 2,
+          x: 3,
+        },
+        gridLineWidth: 0,
+        opposite: true,
+        showLastLabel: false,
+      },
     ],
     plotOptions: {
       series: { pointPlacement: "between", turboThreshold: 0 },
@@ -528,9 +558,19 @@ function createMeteogram(
         type: "spline",
         data: temperatures,
         marker: { enabled: false },
-        tooltip: { pointFormat: "Temp: <b>{point.y}°F</b><br/>" },
+        tooltip: { valueSuffix: " °F" },
         zIndex: 2,
         color: "#E63946",
+      },
+      {
+        name: "Air pressure",
+        dashStyle: "shortdot",
+        data: pressure,
+        marker: { enabled: false },
+        tooltip: { valueSuffix: " inHg" },
+        zIndex: 2,
+        color: "#FFB000",
+        yAxis: 2,
       },
       {
         name: "Precipitation",
@@ -548,7 +588,7 @@ function createMeteogram(
         data: winds,
         yOffset: 12,
         vectorLength: 14,
-        lineWidth: 1.5,
+        lineWidth: 1,
         tooltip: { valueSuffix: " m/s" },
         zIndex: 1,
         color: "#205fb9ff",
@@ -566,19 +606,23 @@ function renderMeteogram() {
   const temp = [];
   const percipi = [];
 
+  const press = [];
+
   const wind_d = [];
   const wind_s = [];
 
   for (const i in hourly_data) {
-    times.push(Date.parse(hourly_data[i].time));
+    times.push(Date.parse(hourly_data[i].time) - 7 * 60 * 60 * 1000);
     temp.push(Math.round(hourly_data[i].values.temperature));
     percipi.push(hourly_data[i].values.precipitationProbability);
     wind_d.push(Math.round(hourly_data[i].values.windDirection));
     wind_s.push(Math.round(hourly_data[i].values.windSpeed));
+    press.push(hourly_data[i].values.pressureSeaLevel);
   }
 
   const temperatures = times.map((x, i) => ({ x, y: temp[i] }));
   const precipitations = times.map((x, i) => ({ x, y: percipi[i] }));
+  const pressure = times.map((x, i) => ({ x, y: press[i] }));
 
   const winds = times.map((x, i) => ({
     x,
@@ -586,13 +630,13 @@ function renderMeteogram() {
     direction: wind_d[i],
   }));
 
-  console.log(temperatures);
-  console.log(precipitations);
-  console.log(winds);
   const t = (h) =>
     Date.parse(`2025-10-27T${String(h).padStart(2, "0")}:00:00Z`);
 
-  createMeteogram({ temperatures, precipitations, winds }, "meteogram");
+  createMeteogram(
+    { temperatures, precipitations, winds, pressure },
+    "meteogram"
+  );
 }
 
 function wireArrowToggle() {

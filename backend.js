@@ -6,7 +6,8 @@ const app = express();
 app.use(cors());
 const port = 3001;
 
-const baseUrl = "https://api.tomorrow.io/v4/weather/forecast?location=";
+const baseUrl =
+  "https://api.tomorrow.io/v4/weather/forecast?timezon=auto&location=";
 const apiKeyURL = "&apikey=" + process.env.TOMORROW_API_KEY;
 
 const googleLocationURL =
