@@ -1,21 +1,28 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 const baseUrl =
-  "https://api.tomorrow.io/v4/weather/forecast?timezon=auto&location=";
+  "https://api.tomorrow.io/v4/weather/forecast?timezone=auto&location=";
 const apiKeyURL = "&apikey=" + process.env.TOMORROW_API_KEY;
 
 const googleLocationURL =
   "https://maps.googleapis.com/maps/api/geocode/json?latlng="; //40.714224,-73.961452
 const googleAPIKey = "&key=" + process.env.GOOGLE_API_KEY;
 
-app.get("/", (req, res) => {
-  res.send("Hello");
+app.use(
+  express.static(path.join(__dirname, "website"), {
+    maxAge: "1d",
+  })
+);
+
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(__dirname, "website", "index.html"));
 });
 
 app.get("/weather", (req, res) => {

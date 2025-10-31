@@ -114,7 +114,7 @@ submit_btn.addEventListener("click", async (e) => {
         const position = await getPosition();
         const { latitude, longitude } = position.coords;
 
-        const url = `http://127.0.0.1:3001/location?lat=${encodeURIComponent(
+        const url = `/location?lat=${encodeURIComponent(
           latitude
         )}&lon=${encodeURIComponent(longitude)}`;
 
@@ -178,12 +178,10 @@ submit_btn.addEventListener("click", async (e) => {
   }
 
   if (checkbox.checked) {
-    url = `http://127.0.0.1:3001/weather?full_address=${encodeURIComponent(
-      geo_address
-    )}`;
+    url = `/weather?full_address=${encodeURIComponent(geo_address)}`;
     console.log(url);
   } else {
-    url = `http://127.0.0.1:3001/weather?street=${encodeURIComponent(
+    url = `/weather?street=${encodeURIComponent(
       street
     )}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
   }
