@@ -2,3 +2,4 @@
 node_modules
 .claude
 app.yaml
+.DS_Store
