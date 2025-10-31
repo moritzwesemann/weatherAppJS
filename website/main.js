@@ -68,6 +68,7 @@ const table_row = document.querySelector(".table-row");
 
 const tempchart_element = document.getElementById("highcharts");
 const metegoram_element = document.getElementById("meteogram");
+const arrow = document.getElementById("arrow-toggle");
 
 let temp_chart = [];
 
@@ -98,6 +99,9 @@ submit_btn.addEventListener("click", async (e) => {
   todays_card.classList.add("hidden");
   week_table.replaceChildren(table_header);
   dd_section.classList.add("hidden");
+  tempchart_element.classList.add("hidden");
+  metegoram_element.classList.add("hidden");
+  arrow.src = "/Images/point-down-512.png";
 
   let geo_address = "";
 
@@ -129,15 +133,21 @@ submit_btn.addEventListener("click", async (e) => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
             console.error("User denied the request for Geolocation.");
+            alert(
+              "You have to allow Geolocation tracking if you want to use auto-detect."
+            );
             break;
           case error.POSITION_UNAVAILABLE:
             console.error("Location information is unavailable.");
+            alert("An error appeard. Please try again.");
             break;
           case error.TIMEOUT:
             console.error("The request to get user location timed out.");
+            alert("An error appeard. Please try again.");
             break;
           case error.UNKNOWN_ERROR:
             console.error("An unknown error occurred.");
+            alert("An error appeard. Please try again.");
             break;
         }
       }
@@ -157,6 +167,10 @@ submit_btn.addEventListener("click", async (e) => {
     console.log(
       "Bro you have to put in some stuff or check the auto detect button"
     );
+    alert(
+      "Please put in a Street, City and State or check the Auto-Detect box."
+    );
+
     return;
   }
 
@@ -187,6 +201,9 @@ submit_btn.addEventListener("click", async (e) => {
     })
     .catch((error) => {
       console.error(`Error trying to fetch the data: ${error}`);
+      alert(
+        "An error has appeard. Please make sure the address you enter is correct."
+      );
     });
 });
 
@@ -339,7 +356,6 @@ function table_row_click(data) {
     formatHourAmPm(data.values.sunsetTime);
 
   wireArrowToggle();
-
   wireBackButton();
 }
 
@@ -642,11 +658,11 @@ function renderMeteogram() {
 }
 
 function wireArrowToggle() {
-  const arrow = document.getElementById("arrow-toggle");
-  if (!arrow || arrow.dataset.toggleWired) return; // avoid duplicates
+  const arr = document.getElementById("arrow-toggle");
+  if (!arr || arr.dataset.toggleWired) return;
 
-  arrow.dataset.toggleWired = "true";
-  arrow.addEventListener("click", (event) => {
+  arr.dataset.toggleWired = "true";
+  arr.addEventListener("click", (event) => {
     const el = event.currentTarget;
     const isDown = el.src.endsWith("point-down-512.png");
 
