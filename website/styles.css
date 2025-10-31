@@ -385,3 +385,8 @@ body {
 #back-button:hover {
   text-decoration: underline;
 }
+
+#loading {
+  text-align: center;
+  font-size: 12px;
+}

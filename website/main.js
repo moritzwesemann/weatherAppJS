@@ -70,6 +70,8 @@ const tempchart_element = document.getElementById("highcharts");
 const metegoram_element = document.getElementById("meteogram");
 const arrow = document.getElementById("arrow-toggle");
 
+const loading = document.getElementById("loading");
+
 let temp_chart = [];
 
 let hourly_data = [];
@@ -102,6 +104,7 @@ submit_btn.addEventListener("click", async (e) => {
   tempchart_element.classList.add("hidden");
   metegoram_element.classList.add("hidden");
   arrow.src = "/Images/point-down-512.png";
+  loading.classList.remove("hidden");
 
   let geo_address = "";
 
@@ -193,6 +196,7 @@ submit_btn.addEventListener("click", async (e) => {
       return response.json();
     })
     .then((data) => {
+      loading.classList.add("hidden");
       updateUI(data);
       temp_chart = prepDataTempChart(data);
       hourly_data = data.timelines.hourly;
