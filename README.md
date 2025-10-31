@@ -1,6 +1,6 @@
 # Weather App
 
-A responsive weather forecast application built with vanilla JavaScript, providing real-time weather information and interactive data visualizations.
+A weather forecast application built with vanilla JavaScript, providing real-time weather information and interactive data visualizations.
 
 ## Live Demo
 
@@ -40,8 +40,6 @@ This project is a full-stack weather application developed to practice and demon
   - UV index and cloud cover
 - Interactive weather charts and meteograms
 - Daily weather forecasts with detailed breakdowns
-- Responsive design for mobile and desktop
-- Custom weather icons for different conditions
 
 ## Project Structure
 
